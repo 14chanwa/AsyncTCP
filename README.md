@@ -1,4 +1,13 @@
-# AsyncTCP 
+# AsyncTCP for BW16 and ESP32
+
+This repo is a fork of the original code from me-no-dev, slightly modifying imports and function calls to make it compatible with both BW16 and ESP32.
+
+The original repo does not provide examples, but some can be taken from [this repo for the Pico (same API)](https://github.com/khoih-prog/AsyncTCP_RP2040W/blob/main/examples/ClientServer/AsyncTCP_Client/AsyncTCP_Client.ino).
+
+
+### Original README
+
+
 [![Build Status](https://travis-ci.org/me-no-dev/AsyncTCP.svg?branch=master)](https://travis-ci.org/me-no-dev/AsyncTCP) ![](https://github.com/me-no-dev/AsyncTCP/workflows/Async%20TCP%20CI/badge.svg) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2f7e4d1df8b446d192cbfec6dc174d2d)](https://www.codacy.com/manual/me-no-dev/AsyncTCP?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=me-no-dev/AsyncTCP&amp;utm_campaign=Badge_Grade)
 
 ### Async TCP Library for ESP32 Arduino

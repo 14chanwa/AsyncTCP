@@ -22,18 +22,40 @@
 #ifndef ASYNCTCP_H_
 #define ASYNCTCP_H_
 
+#ifdef BOARD_AITHINKER_BW16
+#define STD_PRINTF
+#endif
+
 #include "IPAddress.h"
+
+#ifndef BOARD_AITHINKER_BW16
 #include "sdkconfig.h"
+#endif
+
 #include <functional>
+
+#ifndef BOARD_AITHINKER_BW16
 extern "C" {
     #include "freertos/semphr.h"
     #include "lwip/pbuf.h"
 }
+#endif
+
+#ifdef BOARD_AITHINKER_BW16
+#include <FreeRTOS.h>
+#include <sys_arch.h>
+#else
+#include <freertos/FreeRTOS.h>
+#endif
 
 //If core is not defined, then we are running in Arduino or PIO
 #ifndef CONFIG_ASYNC_TCP_RUNNING_CORE
 #define CONFIG_ASYNC_TCP_RUNNING_CORE -1 //any available core
+#ifdef BOARD_AITHINKER_BW16
+#define CONFIG_ASYNC_TCP_USE_WDT 0 //if enabled, adds between 33us and 200us per event
+#else
 #define CONFIG_ASYNC_TCP_USE_WDT 1 //if enabled, adds between 33us and 200us per event
+#endif
 #endif
 
 class AsyncClient;

@@ -19,9 +19,54 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef BOARD_AITHINKER_BW16
 #include "Arduino.h"
+#endif
 
 #include "AsyncTCP.h"
+
+// Additional includes for BW16
+#ifdef BOARD_AITHINKER_BW16
+typedef u32_t in_addr_t;
+#define log_e printf
+#define log_w printf
+
+typedef int esp_err_t;
+#define ESP_OK          0       /*!< esp_err_t value indicating success (no error) */
+#define ESP_FAIL        -1      /*!< Generic esp_err_t code indicating failure */
+
+extern "C"{
+#include <lwip/opt.h>
+#include <lwip/tcp.h>
+#include <lwip/inet.h>
+#include <lwip/dns.h>
+#include <lwip/err.h>
+#define NO_SYS true
+#include <lwip/tcpip.h>
+}
+
+#include <Arduino.h>
+
+struct tcpip_api_call_data
+{
+#if !LWIP_TCPIP_CORE_LOCKING
+   err_t err;
+ #if !LWIP_NETCONN_SEM_PER_THREAD
+     sys_sem_t sem;
+   #endif /* LWIP_NETCONN_SEM_PER_THREAD */
+   #else /* !LWIP_TCPIP_CORE_LOCKING */
+     u8_t dummy; /* avoid empty struct :-( */
+   #endif /* !LWIP_TCPIP_CORE_LOCKING */
+ };
+
+#ifndef CONFIG_LWIP_MAX_ACTIVE_TCP
+#define CONFIG_LWIP_MAX_ACTIVE_TCP 10
+#endif
+
+#define tcpip_api_call(x, y) x(y)
+
+#else
+
 extern "C"{
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
@@ -30,6 +75,8 @@ extern "C"{
 #include "lwip/err.h"
 }
 #include "esp_task_wdt.h"
+
+#endif
 
 /*
  * TCP/IP Event Task
@@ -218,7 +265,11 @@ static bool _start_async_task(){
         return false;
     }
     if(!_async_service_task_handle){
+        #ifdef BOARD_AITHINKER_BW16
+        xTaskCreate(_async_service_task, "async_tcp", 8192 * 2, NULL, 3, &_async_service_task_handle);
+        #else
         xTaskCreateUniversal(_async_service_task, "async_tcp", 8192 * 2, NULL, 3, &_async_service_task_handle, CONFIG_ASYNC_TCP_RUNNING_CORE);
+        #endif
         if(!_async_service_task_handle){
             return false;
         }
@@ -344,7 +395,10 @@ static int8_t _tcp_accept(void * arg, AsyncClient * client) {
  * TCP/IP API Calls
  * */
 
+
+#ifndef BOARD_AITHINKER_BW16
 #include "lwip/priv/tcpip_priv.h"
+#endif
 
 typedef struct {
     struct tcpip_api_call_data call;
